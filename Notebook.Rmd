@@ -17,6 +17,12 @@ What do we need to do:
 - Make this a function  
 - Break it up into call + data wrangle  
 - Need to take # of games as parameter, will need to parse pages accordingly *MAX 40 ENTRIES PER PAGE*  
+- The wrangling gets abit messy due to the fact we get a nested JSON:  
+    - For example, each genre will have the fields: id, name, slug, games_count (not unique)
+    - Therefore, we want to put these fields as column names, and each genre value row-wise
+    - This allows us to create a nicely condense data frame, and is easier to visualize as well as convert to other formats.  
+- This becomes a lot more messy when looking across games. Therefore we will append the genre ID to the field (creating a unique field name).  
+    - This is beneficial in the sense if we want to look at games in our data frame that belong to a specific platform, we can look at the id3 column for null values, where a null value would represent the game is not available for platform with id 3.  
 ```{r}
 library(httr)
 library(jsonlite)
@@ -77,12 +83,13 @@ final_df<-final_df[-1,]
 rownames(final_df)<-NULL
 ```
 **Feb 16, 2021**  
--Created Notebook Repo  
--Break above down into 3 functions:  
+- Created Notebook Repo  
+- Break above down into 3 functions:  
   1) Function to create link based on params & GET request : get_game_list.R  
   2) Parse the request into a JSON: parse_RAWG.R  
   3) Wrangle to JSON into a data frame: extract_as.df_RAWG.R  
--All 3 functions will be in a package called game_list.R (for parsing general game info)  
+- All 3 functions will be in a package called game_list.R (for parsing general game info) 
+- Breaking down the functions into 3 components allows for more user flexibility + easier testing.  
 ```{r}
 library(docstring)
 library(httr)
@@ -292,10 +299,12 @@ parse_req2 <- parse_RAWG(request2)
 df2 <- extract_as.df_RAWG(parse_req2)
 ```
 **Feb 17, 2021**  
--Create a similar set of functions for Genres  
+- Create a similar set of functions for Genres  
   1) New get_genre_list function: get_genre_list()  
   2) Same parse function: parse_RAWG()  
-  3) New extract_as.df_genre function: extract_as.df_RAWG_genre()  
+  3) New extract_as.df_genre function: extract_as.df_RAWG_genre() 
+- Followed the same reasoning above for the wrangling as well as function breakdown.   
+- This can also be very useful to create a look up table for genre ids.  
 ```{r}
 library(httr)
 library(jsonlite)
@@ -628,9 +637,11 @@ get_genre_list<-function(api_key=""){
 }
 ```
 **Feb 17/18, 2021**  
-1) Re-organised game_list.R and genre_list.R  
+1) Re-organized game_list.R and genre_list.R  
 2) Wrote test files  
-3) Modified file structure of repo (vignettes, test folders)                                      
+3) Modified file structure of repo (vignettes, test folders)  
+- Condensed the code into a single function, more simple for users. 
+- The changing of file structure + organization of code follows how most API wrappers we found to look. (Might as well stick to convention)  
 ```{r}
 get_genre_list<-function(api_key=""){
   #' GET request to RAWG
@@ -937,11 +948,17 @@ roxygen2::roxygenise("C://Users//PC//Desktop//Work//Data 534//Project//RAWG.io.W
 Some debugging to get the Travis CI to work - worked with Aamir on this.  
   
 **Feb 19, 2021**  
--Touched up some README, Code_of_Conduct  
--Integrated MacOS into Travis + Setup GitHub activity  
--Will need to create Contributions document   
+- Touched up some README, Code_of_Conduct  
+- Integrated MacOS into Travis + Setup GitHub activity  
+- Will need to create Contributions document   
+- Travis CI works for Linux as well as MacOS but not for Windows
+- To test the Windows build, we needed to use GitHub activity. GitHub activity ends up testing Windows, Linux and MacOS as well.  
 ```{r}
 use_code_of_conduct(path = NULL)
 usethis::use_github_actions()
 ```
 
+**Feb 20, 2021**
+- Final touches on the project.  
+- Add contribution file.  
+- Finish updating this Notebook.  
